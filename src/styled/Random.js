@@ -10,3 +10,7 @@ export const StyledTitle = styled.h1`
     text-align:center;
     margin : 3rem 0 2rem 0;
 `
+
+export const Strong = styled.strong`
+    font-weight:bold;
+`
