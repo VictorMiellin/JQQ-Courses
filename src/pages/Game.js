@@ -1,31 +1,48 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback} from 'react'
 import { StyledCharacter, StyledGame, StyledScore, StyledTimer } from '../styled/Game'
 import { Strong } from "../styled/Random";
 
 export default function Game({history}) {
-    const [score, setScore] = useState(0);
     const MaxSeconds = 90;
+    const characters = "abcdefghijklmnopqrstuvwxyz"
+    const [currentChar, setCurrentChar] = useState('')
+    const [score, setScore] = useState(0);
     const [ms, setMs] = useState(0)
     const [seconds, setSeconds] = useState(MaxSeconds);
     
-    const keyUpHandler = (e) => {
-        console.log(e.key)
+    
+    const setRandomCharacter = () => {
+        setCurrentChar(characters[Math.floor(Math.random() * 26)])
     }
 
-
+    // lancer le jeu
     useEffect(() => {
-        document.addEventListener('keyup', keyUpHandler);
-        return () => {
-            document.removeEventListener('keyup', keyUpHandler)
-        };
-    }, []);
-
-    useEffect(() => {
+        setRandomCharacter()
         const currentTime = new Date();
         const interval = setInterval(() => updateTime(currentTime), 1);
         return () => clearInterval(interval);
     }, []);
 
+// verifier que l'input utilisateur est bon + gestion du score
+    const keyUpHandler = useCallback((e) => {
+        console.log(e.key)
+        if (e.key === currentChar) {
+            setScore((prevScore) => prevScore +1);
+            setRandomCharacter()
+        } else {
+                if(score > 0) {setScore((prevScore) => prevScore -1 )}
+        }        
+    },[currentChar])
+
+    // Ecoute les touche préssées par l'utilsateur
+    useEffect(() => {
+        document.addEventListener('keyup', keyUpHandler);
+        return () => {
+            document.removeEventListener('keyup', keyUpHandler)
+        };
+    }, [keyUpHandler]);
+
+    // gestion du timer
     const updateTime = (startTime) =>{
         const endTime = new Date();
         const passedMs = endTime.getTime() - startTime.getTime();
@@ -36,8 +53,10 @@ export default function Game({history}) {
     
     }
 
+    // game over
     useEffect(()=> {
         if(seconds<= -1) {
+            // Todo : save le score du joueur
             history.push('/gameOver')
         }
 
@@ -46,7 +65,7 @@ export default function Game({history}) {
     return (
         <StyledGame>
             <StyledScore>Score : <Strong>{score}</Strong></StyledScore>
-            <StyledCharacter>A</StyledCharacter>
+            <StyledCharacter>{currentChar}</StyledCharacter>
             <StyledTimer>Time : <Strong>{seconds}:{ms}</Strong></StyledTimer>
         </StyledGame>
     )
