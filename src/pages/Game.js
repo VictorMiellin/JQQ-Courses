@@ -1,12 +1,13 @@
 import React, {useState, useEffect, useCallback} from 'react'
+import { useScore } from '../Context/ScoreContext';
 import { StyledCharacter, StyledGame, StyledScore, StyledTimer } from '../styled/Game'
 import { Strong } from "../styled/Random";
 
 export default function Game({history}) {
-    const MaxSeconds = 90;
+    const MaxSeconds = 3;
     const characters = "abcdefghijklmnopqrstuvwxyz"
     const [currentChar, setCurrentChar] = useState('')
-    const [score, setScore] = useState(0);
+    const [score, setScore] = useScore();
     const [ms, setMs] = useState(0)
     const [seconds, setSeconds] = useState(MaxSeconds);
     
@@ -18,6 +19,7 @@ export default function Game({history}) {
     // lancer le jeu
     useEffect(() => {
         setRandomCharacter()
+        setScore(0);
         const currentTime = new Date();
         const interval = setInterval(() => updateTime(currentTime), 1);
         return () => clearInterval(interval);
